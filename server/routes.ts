@@ -178,11 +178,13 @@ export async function registerRoutes(
     });
   });
   
-  // Only seed locally or when explicitly allowed. Avoid seeding in production
-  // to prevent startup failures when the database is temporarily unreachable.
-  if (process.env.NODE_ENV !== "production" && process.env.SKIP_SEED !== "true") {
+  // Only seed when explicitly requested. This avoids attempting DB connections
+  // during deploys where network/DNS may be unreliable. Set `FORCE_SEED=true`
+  // in the environment to run seeding.
+  if (process.env.FORCE_SEED === "true") {
     await seedDatabase();
   }
+
   return httpServer;
 }
 
