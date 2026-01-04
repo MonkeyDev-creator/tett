@@ -1,10 +1,18 @@
 import dotenv from "dotenv";
+import dns from "dns";
 
 const result = dotenv.config();
 if (result.error) {
   // No .env file found locally — that's fine in production where envs come from the environment.
-  // We keep this warning minimal to avoid noisy logs for CI or production.
-  // console.warn('.env not found, relying on environment variables');
+}
+
+// Prefer IPv4 results first to avoid environments without IPv6 connectivity
+try {
+  // Node 17.7+ supports setDefaultResultOrder
+  // This helps platforms that can't reach IPv6 addresses (ENETUNREACH) resolve an IPv4 address first.
+  (dns as any).setDefaultResultOrder?.("ipv4first");
+} catch (e) {
+  // ignore if not supported
 }
 
 // Ensure a default NODE_ENV for local development when not provided by the shell

@@ -178,7 +178,11 @@ export async function registerRoutes(
     });
   });
   
-  await seedDatabase();
+  // Only seed locally or when explicitly allowed. Avoid seeding in production
+  // to prevent startup failures when the database is temporarily unreachable.
+  if (process.env.NODE_ENV !== "production" && process.env.SKIP_SEED !== "true") {
+    await seedDatabase();
+  }
   return httpServer;
 }
 
